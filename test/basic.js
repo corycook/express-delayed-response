@@ -4,6 +4,7 @@ const {
   status,
 } = require('../index');
 const request = require('supertest');
+const assert = require('assert');
 
 const app = express();
 const options = {
@@ -31,7 +32,16 @@ describe('express-delayed-response', () => {
     it(`should return ${statusCode}`, () => source.get(`/quick/${statusCode}`).expect(statusCode));
   });
 
-  it('should respond 201 for long responses then eventually resolve', () => (
-    source.get('/slow').expect(201)
+  it('should respond 202 for long responses then eventually resolve', () => (
+    source.get('/slow').expect(202).then((response) => {
+      assert(response.body && response.body.id);
+    })
+  ));
+
+  it('should respond 202 on initial status query', () => (
+    source.get('/slow').expect(202).then((response) => {
+      assert(response.body && response.body.id);
+      return source.get(`/status/${response.body.id}`).expect(202);
+    })
   ));
 });

@@ -60,7 +60,7 @@ function delay({
       if (!state.closed) {
         state.closed = true;
         state.suspended = true;
-        response.status(201);
+        response.status(202);
         response.json({
           id,
         });
@@ -80,7 +80,7 @@ function status({
     if (state && state.complete) {
       executeStack(state.stack, res);
     } else if (state) {
-      res.status(201).json({
+      res.status(202).json({
         id,
       });
     } else {
