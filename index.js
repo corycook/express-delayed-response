@@ -40,7 +40,11 @@ function delay({
             method,
             args,
           });
-          return mockResponse[method].call(mockResponse, ...args);
+          const result = mockResponse[method].call(mockResponse, ...args);
+          if (result === mockResponse) {
+            return response;
+          }
+          return result;
         };
       });
     };
@@ -60,8 +64,7 @@ function delay({
       if (!state.closed) {
         state.closed = true;
         state.suspended = true;
-        response.status(202);
-        response.json({
+        response.status(202).json({
           id,
         });
         state.suspended = false;

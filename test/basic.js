@@ -44,4 +44,13 @@ describe('express-delayed-response', () => {
       return source.get(`/status/${response.body.id}`).expect(202);
     })
   ));
+
+  it('should respond 200 on status complete for long operation', (done) => {
+    source.get('/slow').expect(202).then((response) => {
+      assert(response.body && response.body.id);
+      setTimeout(() => {
+        source.get(`/status/${response.body.id}`).expect(200).then(() => done()).catch(() => done());
+      }, 500);
+    });
+  });
 });
