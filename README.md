@@ -13,7 +13,7 @@ app.get('/path', delay(), potentiallySlowHandler);
 
 ### delay.timeout
 
-By default `delay` will respond within 5 seconds, either with the handler response or a `201 Accepted` response. This can be modified with the `timeout` option.
+By default `delay` will respond within 5 seconds, either with the handler response or a `202 Accepted` response. This can be modified with the `timeout` option.
 
 ```javascript
 // provide the timeout in milliseconds (wait 30 seconds)
@@ -24,7 +24,7 @@ app.get('/path', delay({ timeout: 30000 }), potentiallySlowHandler);
 
 Use `status` middleware to query operation status and get cached responses.
 
-If the operation is still processing then it will return a `201 Accepted` response; otherwise, it will return the cached response from the initial operation.
+If the operation is still processing then it will return a `202 Accepted` response; otherwise, it will return the cached response from the initial operation.
 
 ```javascript
 const { status } = require('express-delayed-response');
