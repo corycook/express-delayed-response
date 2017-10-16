@@ -83,8 +83,9 @@ function status({
       res.status(201).json({
         id,
       });
+    } else {
+      res.sendStatus(404);
     }
-    res.sendStatus(404);
   };
 }
 
