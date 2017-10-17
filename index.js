@@ -21,10 +21,10 @@ function delay({
     });
     const id = shortid.generate();
     const stack = [];
+    let closed = false;
+    let suspended = false;
     const state = {
       complete: false,
-      closed: false,
-      suspended: false,
       stack,
     };
     map[id] = state;
@@ -33,7 +33,7 @@ function delay({
       methods.forEach((method) => {
         handlers[method] = response[method];
         response[method] = (...args) => {
-          if (state.suspended || state.complete) {
+          if (state.complete || suspended) {
             return handlers[method].call(response, ...args);
           }
           stack.push({
@@ -41,10 +41,7 @@ function delay({
             args,
           });
           const result = mockResponse[method].call(mockResponse, ...args);
-          if (result === mockResponse) {
-            return response;
-          }
-          return result;
+          return result === mockResponse ? response : result;
         };
       });
     };
@@ -55,19 +52,19 @@ function delay({
     );
     mockResponse.on('end', () => {
       state.complete = true;
-      if (!state.closed) {
-        state.closed = true;
+      if (!closed) {
+        closed = true;
         executeStack(stack, response);
       }
     });
     setTimeout(() => {
-      if (!state.closed) {
-        state.closed = true;
-        state.suspended = true;
+      if (!closed) {
+        closed = true;
+        suspended = true;
         response.status(202).json({
           id,
         });
-        state.suspended = false;
+        suspended = false;
       }
     }, timeout);
     next();

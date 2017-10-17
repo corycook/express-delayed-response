@@ -6,23 +6,37 @@ const {
 const request = require('supertest');
 const assert = require('assert');
 
+function timer(millis) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, millis);
+  });
+}
+
 const app = express();
 const options = {
-  timeout: 500,
+  timeout: 100,
 };
 
 app.get('/status/:id', status());
 
-app.get('/quick/:responseCode', delay(options), (req, res) => {
+app.use(delay(options));
+
+app.get('/quick/:responseCode', (req, res) => {
   res.sendStatus(Number.parseInt(req.params.responseCode, 10));
 });
 
-app.get('/slow', delay(options), (req, res) => {
+app.get('/slow', (req, res) => {
   setTimeout(() => {
     res.status(200).json({
       message: 'success',
     });
-  }, 1000);
+  }, 200);
+});
+
+app.get('/cookie', (req, res) => {
+  setTimeout(() => {
+    res.cookie('test', 'test').send();
+  }, 200);
 });
 
 describe('express-delayed-response', () => {
@@ -45,12 +59,17 @@ describe('express-delayed-response', () => {
     })
   ));
 
-  it('should respond 200 on status complete for long operation', (done) => {
-    source.get('/slow').expect(202).then((response) => {
-      assert(response.body && response.body.id);
-      setTimeout(() => {
-        source.get(`/status/${response.body.id}`).expect(200).then(() => done()).catch(() => done());
-      }, 500);
-    });
-  });
+  it('should respond 200 on status complete for long operation', () => (
+    source.get('/slow').expect(202).then(response => timer(100).then(() => (
+      source.get(`/status/${response.body.id}`).expect(200)
+    ))).then((response) => {
+      assert(response.body && response.body.message);
+    })
+  ));
+
+  it('should set cookies', () => (
+    source.get('/cookie').expect(202).then(response => timer(100).then(() => (
+      source.get(`/status/${response.body.id}`).expect(200).expect('set-cookie', 'test=test; Path=/')
+    )))
+  ));
 });
