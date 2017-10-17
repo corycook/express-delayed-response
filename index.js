@@ -48,7 +48,7 @@ function delay({
     proxyMethod(
       'status', 'links', 'location', 'set', 'type', 'vary', 'cookie', 'append',
       'attachment', 'json', 'jsonp', 'redirect', 'render', 'sendFile', 'sendStatus',
-      'download', 'get', 'send',
+      'download', 'get', 'send' // eslint-disable-line comma-dangle
     );
     mockResponse.on('end', () => {
       state.complete = true;
