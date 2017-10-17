@@ -72,4 +72,8 @@ describe('express-delayed-response', () => {
       source.get(`/status/${response.body.id}`).expect(200).expect('set-cookie', 'test=test; Path=/')
     )))
   ));
+
+  it('should return 404 if requesting non-existent status id', () => (
+    source.get('/status/null').expect(404)
+  ));
 });
