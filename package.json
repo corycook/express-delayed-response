@@ -6,11 +6,13 @@
   "scripts": {
     "test": "mocha",
     "lint": "eslint **/*.js",
+    "coverage": "nyc npm test",
     "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
   },
   "author": "Cory M Cook",
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
+    "lru-cache": "^4.1.1",
     "node-mocks-http": "^1.6.6",
     "shortid": "^2.2.8"
   },

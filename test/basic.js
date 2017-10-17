@@ -2,7 +2,7 @@ const express = require('express');
 const {
   delay,
   status,
-} = require('../index');
+} = require('../index').init();
 const request = require('supertest');
 const assert = require('assert');
 
@@ -13,13 +13,12 @@ function timer(millis) {
 }
 
 const app = express();
-const options = {
-  timeout: 100,
-};
 
 app.get('/status/:id', status());
 
-app.use(delay(options));
+app.use(delay({
+  timeout: 100,
+}));
 
 app.get('/quick/:responseCode', (req, res) => {
   res.sendStatus(Number.parseInt(req.params.responseCode, 10));
