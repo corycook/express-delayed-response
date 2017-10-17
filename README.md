@@ -1,4 +1,6 @@
 # express-delayed-response
+[![Build Status](https://travis-ci.org/corycook/express-delayed-response.svg?branch=master)](https://travis-ci.org/corycook/express-delayed-response)
+
 Break long running processes into multiple requests with a status end point.
 
 ## delay
