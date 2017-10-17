@@ -4,13 +4,15 @@
   "description": "automatically provides polling responses for long running operations",
   "main": "index.js",
   "scripts": {
-    "test": "nyc mocha",
-    "lint": "eslint **/*.js"
+    "test": "mocha",
+    "lint": "eslint **/*.js",
+    "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
   },
   "author": "Cory M Cook",
   "license": "SEE LICENSE IN LICENSE",
   "dependencies": {
     "ajv": "^5.2.3",
+    "coveralls": "^3.0.0",
     "eslint": "^4.8.0",
     "eslint-config-airbnb": "^16.0.0",
     "eslint-plugin-import": "2.7.0",
