@@ -41,6 +41,10 @@ app.get('/cookie', (req, res) => {
 describe('express-delayed-response', () => {
   const source = request(app);
 
+  it('should not throw error with default values', () => {
+    assert.doesNotThrow(delay);
+  });
+
   [200, 201, 202, 203, 400, 401, 402, 403, 404, 500, 501, 502, 503, 504].forEach((statusCode) => {
     it(`should return ${statusCode}`, () => source.get(`/quick/${statusCode}`).expect(statusCode));
   });
