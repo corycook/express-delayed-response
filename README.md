@@ -1,4 +1,5 @@
 # express-delayed-response
+[![npm version](https://badge.fury.io/js/express-delayed-response.svg)](https://badge.fury.io/js/express-delayed-response)
 [![Build Status](https://travis-ci.org/corycook/express-delayed-response.svg?branch=master)](https://travis-ci.org/corycook/express-delayed-response)
 [![Coverage Status](https://coveralls.io/repos/github/corycook/express-delayed-response/badge.svg?branch=master)](https://coveralls.io/github/corycook/express-delayed-response?branch=master)
 
