@@ -22,9 +22,7 @@ function expressDelayedResponse({
   cacheKey = 'express-delayed-response',
 } = {}) {
   return {
-    delay({
-      timeout = 5000,
-    } = {}) {
+    delay({ timeout = 5000 } = {}) {
       return (req, response, next) => {
         const mockResponse = createResponse({
           eventEmitter: events.EventEmitter,
@@ -47,14 +45,15 @@ function expressDelayedResponse({
             if (state.complete || suspended) {
               return handlers[method].call(response, ...args);
             }
-            stack.push({
-              method,
-              args,
-            });
+            stack.push({ method, args });
             const result = mockResponse[method].call(mockResponse, ...args);
             return result === mockResponse ? response : result;
           };
         });
+        response.progress = function progress(status) {
+          state.progress = status;
+          cacheClient.hset(cacheKey, id, JSON.stringify(state));
+        };
         mockResponse.on('end', () => {
           state.complete = true;
           if (!closed) {
@@ -68,18 +67,14 @@ function expressDelayedResponse({
           if (!closed) {
             closed = true;
             suspended = true;
-            response.status(202).json({
-              id,
-            });
+            response.status(202).json({ id });
             suspended = false;
           }
         }, timeout);
         next();
       };
     },
-    status({
-      resolveID = req => req.params.id,
-    } = {}) {
+    status({ resolveID = req => req.params.id } = {}) {
       return (req, res) => {
         const id = resolveID(req);
         cacheClient.hget(cacheKey, id, (err, cacheItem) => {
@@ -87,9 +82,7 @@ function expressDelayedResponse({
           if (state && state.complete) {
             executeStack(state.stack, res);
           } else if (state) {
-            res.status(202).json({
-              id,
-            });
+            res.status(202).json({ id, progress: state.progress });
           } else {
             res.sendStatus(404);
           }

@@ -38,6 +38,20 @@ app.get('/cookie', (req, res) => {
   }, 200);
 });
 
+const progressPayload = {
+  percentComplete: 50,
+  message: 'Already half way there!',
+};
+
+app.get('/progress', (req, res) => {
+  setTimeout(() => {
+    res.progress(progressPayload);
+    setTimeout(() => {
+      res.json({ message: 'success' });
+    }, 100);
+  }, 200);
+});
+
 describe('express-delayed-response', () => {
   const source = request(app);
 
@@ -78,5 +92,11 @@ describe('express-delayed-response', () => {
 
   it('should return 404 if requesting non-existent status id', () => (
     source.get('/status/null').expect(404)
+  ));
+
+  it('should update progress indicator', () => (
+    source.get('/progress').expect(202).then(response => timer(100).then(() => (
+      source.get(`/status/${response.body.id}`).expect(202).expect({ id: response.body.id, progress: progressPayload })
+    )))
   ));
 });
