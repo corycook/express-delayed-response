@@ -82,3 +82,40 @@ const { delay, status } = delayedResponse.init({
 ```
 
 The cache client uses [`lru-cache`](https://www.npmjs.com/package/lru-cache) and the options are passed directly to the LRU instace created.
+
+## res.progress()
+
+While the client is waiting for the server to resolve it is possible to provide status indications to the client via the status end point.
+
+`delay` adds the `progress` method to response that accepts a string or json argument
+that is added to the status response `progress` field.
+
+```javascript
+app.use(delay(), (req, res, next) => {
+    const items = req.body.items;
+    const state = { completed: 0, of: items.length };
+    res.progress(state)
+    const requests = items.map((item) => (
+        processItem(item).then((result) => {
+            state.completed++;
+            res.progress(state);
+            return result;
+        })
+    ));
+    Promise.all(requests).then((data) => {
+        res.json({ data });
+    });
+});
+```
+
+Then on a status query:
+
+```json
+{
+    "id": "Rasdclajs-",
+    "progress": {
+        "completed": 10,
+        "of": 200
+    }
+}
+```
