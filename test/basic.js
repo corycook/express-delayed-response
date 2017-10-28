@@ -2,13 +2,13 @@ const express = require('express');
 const {
   delay,
   status,
-} = require('../index').init();
+} = require('../src/index').init();
 const request = require('supertest');
 const assert = require('assert');
 
-function timer(millis) {
+function timer(ms) {
   return new Promise((resolve) => {
-    setTimeout(resolve, millis);
+    setTimeout(resolve, ms);
   });
 }
 
@@ -30,6 +30,14 @@ app.get('/slow', (req, res) => {
       message: 'success',
     });
   }, 200);
+});
+
+app.get('/exact/:delay', (req, res) => {
+  setTimeout(() => {
+    res.json({
+      message: 'success',
+    });
+  }, parseInt(req.params.delay, 10));
 });
 
 app.get('/cookie', (req, res) => {
@@ -99,4 +107,15 @@ describe('express-delayed-response', () => {
       source.get(`/status/${response.body.id}`).expect(202).expect({ id: response.body.id, progress: progressPayload })
     )))
   ));
+
+  for (let ms = 80; ms <= 110; ms += 2) {
+    it(`there should not be race conditions (delay: ${ms})`, () => (
+      source.get(`/exact/${ms}`).then((response) => {
+        if (response.status === 202) {
+          return timer(20).then(() => source.get(`/status/${response.body.id}`).expect(200));
+        }
+        return assert.equal(response.status, 200);
+      })
+    ));
+  }
 });

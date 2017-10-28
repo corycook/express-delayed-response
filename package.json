@@ -2,7 +2,7 @@
   "name": "express-delayed-response",
   "version": "0.3.0",
   "description": "automatically provides polling responses for long running operations",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "mocha",
     "lint": "eslint **/*.js",

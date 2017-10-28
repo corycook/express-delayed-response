@@ -1,4 +1,4 @@
-const createClient = require('../lib/createClient');
+const createClient = require('../src/lib/createClient');
 const shortid = require('shortid');
 const assert = require('assert');
 
