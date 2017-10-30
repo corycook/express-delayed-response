@@ -1,6 +1,6 @@
 {
   "name": "express-delayed-response",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "automatically provides polling responses for long running operations",
   "main": "src/index.js",
   "scripts": {
