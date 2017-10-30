@@ -36,7 +36,6 @@ function expressDelayedResponse({
         const handlers = {};
         cacheClient.hset(cacheKey, id, JSON.stringify(state));
 
-        let closed = false;
         let suspended = false;
 
         proxyMethods.forEach((method) => {
@@ -56,16 +55,14 @@ function expressDelayedResponse({
         };
         mockResponse.on('end', () => {
           state.complete = true;
-          if (!closed) {
-            closed = true;
+          if (!response.headersSent) {
             executeStack(stack, response);
           } else {
             cacheClient.hset(cacheKey, id, JSON.stringify(state));
           }
         });
         setTimeout(() => {
-          if (!closed) {
-            closed = true;
+          if (!response.headersSent) {
             suspended = true;
             response.status(202).json({ id });
             suspended = false;
