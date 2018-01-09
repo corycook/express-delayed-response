@@ -1,44 +1,60 @@
 const shortid = require('shortid');
-const {
-  createResponse,
-} = require('node-mocks-http');
+const { createResponse } = require('node-mocks-http');
 const events = require('events');
 const createClient = require('./lib/createClient');
 
 function executeStack(stack, response, thisArg = response) {
-  stack.forEach((item) => {
+  stack.forEach(item => {
     response[item.method].call(thisArg, ...item.args);
   });
 }
 
 const proxyMethods = [
-  'status', 'links', 'location', 'set', 'type', 'vary', 'cookie', 'append',
-  'attachment', 'json', 'jsonp', 'redirect', 'render', 'sendFile', 'sendStatus',
-  'download', 'get', 'send',
+  'append',
+  'attachment',
+  'cookie',
+  'download',
+  'end',
+  'get',
+  'json',
+  'jsonp',
+  'links',
+  'location',
+  'redirect',
+  'render',
+  'send',
+  'sendFile',
+  'sendStatus',
+  'set',
+  'setHeader',
+  'status',
+  'type',
+  'write',
+  'vary'
 ];
 
 function expressDelayedResponse({
   cacheClient = createClient({ max: 5000 }),
-  cacheKey = 'express-delayed-response',
+  cacheKey = 'express-delayed-response'
 } = {}) {
   return {
     delay({ timeout = 5000 } = {}) {
       return (req, response, next) => {
         const mockResponse = createResponse({
-          eventEmitter: events.EventEmitter,
+          eventEmitter: events.EventEmitter
         });
         const id = shortid.generate();
         const stack = [];
         const state = {
           complete: false,
-          stack,
+          stack
         };
         const handlers = {};
         cacheClient.hset(cacheKey, id, JSON.stringify(state));
 
         let suspended = false;
 
-        proxyMethods.forEach((method) => {
+        proxyMethods.forEach(method => {
           handlers[method] = response[method];
           response[method] = (...args) => {
             if (state.complete || suspended) {
@@ -85,11 +101,11 @@ function expressDelayedResponse({
           }
         });
       };
-    },
+    }
   };
 }
 
 module.exports = {
   init: expressDelayedResponse,
-  createCacheClient: createClient,
+  createCacheClient: createClient
 };
