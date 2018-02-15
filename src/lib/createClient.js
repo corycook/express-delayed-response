@@ -13,9 +13,9 @@ function createClient(options) {
         throw Error('No callback supplied to get.');
       }
       if (!cache.has(key)) {
-        callback.call(null, null, null);
+        callback(null, null, null);
       } else {
-        callback.call(null, null, cache.get(key));
+        callback(null, null, cache.get(key));
       }
     },
     set(key, value, callback, maxAge) {
