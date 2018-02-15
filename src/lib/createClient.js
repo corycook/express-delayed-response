@@ -20,7 +20,8 @@ function createClient(options) {
     },
     set(key, value, callback, maxAge) {
       const created = !cache.has(key);
-      cache.set(key, value, maxAge);
+      // maxAge for lru-cache is defined in ms
+      cache.set(key, value, maxAge * 1000);
       if (callback) {
         callback(null, created);
       }
