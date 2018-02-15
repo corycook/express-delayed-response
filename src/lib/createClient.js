@@ -8,23 +8,23 @@ const LRU = require('lru-cache');
 function createClient(options) {
   const cache = LRU(options);
   return {
-    hget(key, field, callback) {
-      if (!callback) {
-        throw Error('No callback supplied to hget.');
+    get(key, callback) {
+      if (!callback || typeof callback !== 'function') {
+        throw Error('No callback supplied to get.');
       }
-      if (!cache.has(field)) {
-        callback(null, null);
+      if (!cache.has(key)) {
+        callback.call(null, null, null);
       } else {
-        callback(null, cache.get(field));
+        callback.call(null, null, cache.get(key));
       }
     },
-    hset(key, field, value, callback) {
-      const created = !cache.has(field);
-      cache.set(field, value);
+    set(key, value, callback, maxAge) {
+      const created = !cache.has(key);
+      cache.set(key, value, maxAge);
       if (callback) {
         callback(null, created);
       }
-    },
+    }
   };
 }
 

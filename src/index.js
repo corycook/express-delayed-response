@@ -35,7 +35,8 @@ const proxyMethods = [
 
 function expressDelayedResponse({
   cacheClient = createClient({ max: 5000 }),
-  cacheKey = 'express-delayed-response'
+  cacheKey = 'express-delayed-response',
+  cacheExpire = 3600
 } = {}) {
   return {
     delay({ timeout = 5000 } = {}) {
@@ -50,7 +51,7 @@ function expressDelayedResponse({
           stack
         };
         const handlers = {};
-        cacheClient.hset(cacheKey, id, JSON.stringify(state));
+        cacheClient.set(`${cacheKey}-${id}`, JSON.stringify(state));
 
         let suspended = false;
 
@@ -67,14 +68,14 @@ function expressDelayedResponse({
         });
         response.progress = function progress(status) {
           state.progress = status;
-          cacheClient.hset(cacheKey, id, JSON.stringify(state));
+          cacheClient.set(`${cacheKey}-${id}`, JSON.stringify(state), null, cacheExpire);
         };
         mockResponse.on('end', () => {
           state.complete = true;
           if (!response.headersSent) {
             executeStack(stack, response);
           } else {
-            cacheClient.hset(cacheKey, id, JSON.stringify(state));
+            cacheClient.set(`${cacheKey}-${id}`, JSON.stringify(state), null, cacheExpire);
           }
         });
         setTimeout(() => {
@@ -90,7 +91,7 @@ function expressDelayedResponse({
     status({ resolveID = req => req.params.id } = {}) {
       return (req, res) => {
         const id = resolveID(req);
-        cacheClient.hget(cacheKey, id, (err, cacheItem) => {
+        cacheClient.get(`${cacheKey}-${id}`, (err, cacheItem) => {
           const state = cacheItem && JSON.parse(cacheItem);
           if (state && state.complete) {
             executeStack(state.stack, res);
