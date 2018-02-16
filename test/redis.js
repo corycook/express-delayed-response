@@ -1,8 +1,9 @@
 const express = require('express');
+const cacheClient = require('redis').createClient();
 const {
   delay,
   status,
-} = require('../src/index').init();
+} = require('../src/index').init({ cacheClient });
 const request = require('supertest');
 const assert = require('assert');
 
@@ -60,8 +61,12 @@ app.get('/progress', (req, res) => {
   }, 200);
 });
 
-describe('express-delayed-response', () => {
+describe('express-delayed-response with Redis', () => {
   const source = request(app);
+
+  after((done) => {
+    cacheClient.quit(done);
+  });
 
   it('should not throw error with default values', () => {
     assert.doesNotThrow(delay);
