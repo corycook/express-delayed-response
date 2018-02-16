@@ -4,7 +4,7 @@ const events = require('events');
 const createClient = require('./lib/createClient');
 
 function executeStack(stack, response, thisArg = response) {
-  stack.forEach(item => {
+  stack.forEach((item) => {
     response[item.method].call(thisArg, ...item.args);
   });
 }
@@ -30,32 +30,32 @@ const proxyMethods = [
   'status',
   'type',
   'write',
-  'vary'
+  'vary',
 ];
 
 function expressDelayedResponse({
   cacheClient = createClient({ max: 5000 }),
   cacheKey = 'express-delayed-response',
-  cacheExpire = 3600
+  cacheExpire = 3600000,
 } = {}) {
   return {
     delay({ timeout = 5000 } = {}) {
       return (req, response, next) => {
         const mockResponse = createResponse({
-          eventEmitter: events.EventEmitter
+          eventEmitter: events.EventEmitter,
         });
         const id = shortid.generate();
         const stack = [];
         const state = {
           complete: false,
-          stack
+          stack,
         };
         const handlers = {};
         cacheClient.set(`${cacheKey}-${id}`, JSON.stringify(state));
 
         let suspended = false;
 
-        proxyMethods.forEach(method => {
+        proxyMethods.forEach((method) => {
           handlers[method] = response[method];
           response[method] = (...args) => {
             if (state.complete || suspended) {
@@ -68,14 +68,14 @@ function expressDelayedResponse({
         });
         response.progress = function progress(status) {
           state.progress = status;
-          cacheClient.set(`${cacheKey}-${id}`, JSON.stringify(state), null, cacheExpire);
+          cacheClient.set(`${cacheKey}-${id}`, JSON.stringify(state), 'PX', cacheExpire);
         };
         mockResponse.on('end', () => {
           state.complete = true;
           if (!response.headersSent) {
             executeStack(stack, response);
           } else {
-            cacheClient.set(`${cacheKey}-${id}`, JSON.stringify(state), null, cacheExpire);
+            cacheClient.set(`${cacheKey}-${id}`, JSON.stringify(state), 'PX', cacheExpire);
           }
         });
         setTimeout(() => {
@@ -102,11 +102,11 @@ function expressDelayedResponse({
           }
         });
       };
-    }
+    },
   };
 }
 
 module.exports = {
   init: expressDelayedResponse,
-  createCacheClient: createClient
+  createCacheClient: createClient,
 };

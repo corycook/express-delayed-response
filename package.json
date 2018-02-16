@@ -1,6 +1,6 @@
 {
   "name": "express-delayed-response",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "automatically provides polling responses for long running operations",
   "main": "src/index.js",
   "scripts": {
@@ -26,6 +26,7 @@
     "express": "^4.16.2",
     "mocha": "^4.0.1",
     "nyc": "^11.2.1",
+    "redis": "^2.8.0",
     "supertest": "^3.0.0"
   },
   "engines": {
