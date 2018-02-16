@@ -1,5 +1,4 @@
 const LRU = require('lru-cache');
-// const redis = require('redis').createClient();
 
 /**
  * Creates a local in-memory LRU cache.
@@ -20,8 +19,7 @@ function createClient(options) {
     },
     set(key, value, mode, maxAge, callback) {
       const created = !cache.has(key);
-      // maxAge for lru-cache is defined in ms
-      cache.set(key, value, maxAge * 1000);
+      cache.set(key, value, maxAge);
       if (callback) {
         callback(null, created);
       }

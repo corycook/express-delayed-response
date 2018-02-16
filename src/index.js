@@ -36,7 +36,7 @@ const proxyMethods = [
 function expressDelayedResponse({
   cacheClient = createClient({ max: 5000 }),
   cacheKey = 'express-delayed-response',
-  cacheExpire = 3600,
+  cacheExpire = 3600000,
 } = {}) {
   return {
     delay({ timeout = 5000 } = {}) {
