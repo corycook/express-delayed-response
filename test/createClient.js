@@ -11,7 +11,7 @@ describe('Test createClient', () => {
 
   it('should save object by id', (done) => {
     client.set(appKey, value);
-    client.set(appKey, value, () => {
+    client.set(appKey, value, 'PX', 1000, () => {
       client.get(appKey, (err, res) => {
         assert.deepEqual(res, value);
         done();

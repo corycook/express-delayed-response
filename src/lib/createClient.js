@@ -18,14 +18,14 @@ function createClient(options) {
         callback(null, cache.get(key));
       }
     },
-    set(key, value, callback, maxAge) {
+    set(key, value, mode, maxAge, callback) {
       const created = !cache.has(key);
       // maxAge for lru-cache is defined in ms
       cache.set(key, value, maxAge * 1000);
       if (callback) {
         callback(null, created);
       }
-    }
+    },
   };
 }
 
