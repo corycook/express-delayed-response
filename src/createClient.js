@@ -1,11 +1,11 @@
-const LRU = require('lru-cache');
+const LRUCache = require('lru-cache');
 
 /**
  * Creates a local in-memory LRU cache.
  * @param {LRU.Options} options The lru-cache options
  */
 function createClient(options) {
-  const cache = LRU(options);
+  const cache = new LRUCache(options);
   return {
     get(key, callback) {
       if (!callback || typeof callback !== 'function') {
