@@ -34,7 +34,7 @@
     "supertest": "^4.0.2"
   },
   "engines": {
-    "node": ">=6.10.0"
+    "node": ">=8.10.0"
   },
   "repository": "https://github.com/corycook/express-delayed-response.git"
 }
