@@ -135,6 +135,18 @@ function testIndex(title, createUnderTest) {
       clock.tick(200);
       return source.get(`/status/${response.body.id}`).expect(200);
     });
+
+    it('should work for multiple long requests', async () => {
+      const source = createSlowAppRequest();
+
+      const first = await source.get('/slow').expect(202);
+      clock.tick(100);
+      const second = await source.get('/slow').expect(202);
+      clock.tick(100);
+      assert(first.body.id !== second.body.id);
+      await source.get(`/status/${first.body.id}`).expect(200);
+      await source.get(`/status/${second.body.id}`).expect(200);
+    });
   });
 
   function createApp() {

@@ -2,17 +2,21 @@
 class CacheSettingTracker {
   constructor() {
     this.current = Promise.resolve();
-    this.callback = () => {};
+    this.onComplete = () => {};
   }
 
   start() {
+    const previous = this.onComplete;
     this.current = new Promise((callback) => {
-      this.callback = callback;
+      this.onComplete = () => {
+        previous();
+        callback();
+      };
     });
   }
 
   complete() {
-    this.callback();
+    this.onComplete();
     this.current = Promise.resolve();
   }
 }
